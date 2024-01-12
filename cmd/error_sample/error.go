@@ -1,14 +1,15 @@
-package etc_sample
+package error_sample
 
 import (
+    "fmt"
     "net/http"
 
     "github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-
+    "github.com/gin-gonic/gin/binding"
+    "gopkg.in/go-playground/validator.v9"
 )
 
-func Error_handle() {
+func main() {
     binding.Validator = new(defaultValidator)
 
     r := gin.Default()
@@ -19,8 +20,10 @@ func Error_handle() {
         }
 
         if err := c.ShouldBind(&query); err != nil {
-            c.JSON(http.StatusBadRequest, err.Error())
-            return
+            for _, fieldErr := range err.(validator.ValidationErrors) {
+                c.JSON(http.StatusBadRequest, fmt.Sprint(fieldErr))
+                return // exit on the first error
+            }
         }
 
         c.JSON(http.StatusOK, gin.H{"status": "ok"})

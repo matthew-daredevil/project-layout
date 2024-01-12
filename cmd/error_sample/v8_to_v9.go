@@ -1,4 +1,4 @@
-package etc_sample
+package error_sample
 
 import (
     "reflect"
